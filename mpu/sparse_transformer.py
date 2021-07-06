@@ -23,7 +23,7 @@ import torch_xla
 import torch_xla.core.xla_model as xm
 
 import torch.nn.init as init
-from apex.normalization.fused_layer_norm import FusedLayerNorm #as LayerNorm
+#from apex.normalization.fused_layer_norm import FusedLayerNorm #as LayerNorm
 
 from .initialize import get_model_parallel_world_size
 from .layers import ColumnParallelLinear
@@ -40,7 +40,7 @@ from .utils import split_tensor_along_last_dim
 import torch_xla.distributed as dist
 
 
-class LayerNorm(FusedLayerNorm):
+class LayerNorm():
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     def forward(self, x):
