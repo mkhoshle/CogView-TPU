@@ -44,6 +44,8 @@ from copy import deepcopy
 from tqdm import tqdm
 from generation import get_batch, filling_sequence, add_interlacing_beam_marks, magnify, inverse_prompt_score
 
+from googletrans import Translator
+import string
 from torchvision.utils import save_image
 
 import torch_xla
@@ -80,9 +82,13 @@ def _parse_and_to_tensor(text, img_size=256, query_template='{}'):
     text = query_template.format(*text.split('\t'))
     seq = tokenizer.parse_query(text, img_size=img_size)
     seq = torch.LongTensor(seq,device=xm.xla_device())
+    text = query_template.format(*text.split("\\t"))
+    
     return seq
 
 def get_context(args, query_template='{}'):
+    translator = Translator()
+    
     tokenizer = get_tokenizer()
     terminate_runs = 0
     img_size = 256 if args.generation_task != 'low-level super-resolution' else 128
@@ -98,6 +104,8 @@ def get_context(args, query_template='{}'):
             if not raw_text:
                 print('Query should not be empty!')
                 continue
+            if raw_text != "stop" and raw_text.lower()[0] in list(string.ascii_lowercase):
+                raw_text = translator.translate(raw_text, dest="zh-cn").text
             if raw_text == "stop":
                 return 
             try:
