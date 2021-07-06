@@ -647,7 +647,7 @@ def initialize_distributed(args):
     """Initialize torch.distributed."""
 
     # Manually set the device ids.
-    device = args.rank % torch.cuda.device_count()
+    device = args.rank % torch.device_count()
     if args.local_rank is not None:
         device = args.local_rank
     torch.xla.set_device(device)
