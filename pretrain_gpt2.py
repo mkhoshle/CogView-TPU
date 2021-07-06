@@ -41,7 +41,7 @@ if USE_TORCH_DDP:
 else:
     from model import DistributedDataParallel as DDP
 import mpu
-from apex.optimizers import FusedAdam as Adam
+#from apex.optimizers import FusedAdam as Adam
 from utils import Timers
 from utils import save_checkpoint
 from utils import load_checkpoint
@@ -136,10 +136,10 @@ def get_optimizer(param_groups, args):
             cpu_adam_optimizer = DeepSpeedCPUAdam
         optimizer = cpu_adam_optimizer(param_groups,
                         lr=args.lr, weight_decay=args.weight_decay)
-    else:
+#    else:
         # Use FusedAdam.
-        optimizer = Adam(param_groups,
-                         lr=args.lr, weight_decay=args.weight_decay)
+#        optimizer = Adam(param_groups,
+#                         lr=args.lr, weight_decay=args.weight_decay)
 
     print(f'Optimizer = {optimizer.__class__.__name__}')
     if hasattr(args, "deepspeed") and args.deepspeed:
