@@ -27,7 +27,7 @@ import numpy as np
 import torch
 import torch_xla
 
-import deepspeed
+# import deepspeed
 from contextlib import ExitStack
 from arguments import get_args
 from fp16 import FP16_Module
