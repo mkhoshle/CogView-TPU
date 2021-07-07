@@ -52,6 +52,7 @@ from utils import print_rank_0
 from utils import get_sample_writer
 import torch_xla.distributed as dist
 import torch_xla.core.xla_model as xm
+import torch_xla.distributed.xla_multiprocessing as xmp
 
 from data_utils import make_loaders, get_tokenizer, detect_new_datasets
 
@@ -81,30 +82,34 @@ def get_model(args):
                       num_pivot=args.num_pivot
                       )
 
-    if mpu.get_data_parallel_rank() == 0:
-        print(' > number of parameters on model parallel rank {}: {}'.format(
-            mpu.get_model_parallel_rank(),
-            sum([p.nelement() for p in model.parameters()])), flush=True)
+#    if mpu.get_data_parallel_rank() == 0:
+#        print(' > number of parameters on model parallel rank {}: {}'.format(
+#            mpu.get_model_parallel_rank(),
+#            sum([p.nelement() for p in model.parameters()])), flush=True)
 
     # To prevent OOM for model sizes that cannot fit in GPU memory in full precision
     if hasattr(args, "deepspeed") and args.deepspeed and args.fp16:
         model.half()
 
     # GPU allocation.
-    model.cuda(torch.xla.current_device())
+#    model.cuda(torch.xla.current_device())
 
     # Fp16 conversion.
     if args.fp16:
         model = FP16_Module(model)
 
     # Wrap model for distributed training.
-    if not args.deepspeed:
-        if USE_TORCH_DDP:
-            i = torch.xla.current_device()
-            model = DDP(model, device_ids=[i], output_device=i,
-                        process_group=mpu.get_data_parallel_group())
-        else:
-            model = DDP(model)
+#    if not args.deepspeed:
+#        if USE_TORCH_DDP:
+#            i = torch.xla.current_device()
+#            model = DDP(model, device_ids=[i], output_device=i,
+#                        process_group=mpu.get_data_parallel_group())
+#        else:
+#            model = DDP(model)
+
+    device = xm.xla_device()
+    mx    = xmp.MpModelWrapper(model)
+    model  = mx.to(device)
 
     return model
 
