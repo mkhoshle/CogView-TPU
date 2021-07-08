@@ -39,8 +39,8 @@ def get_sample_writer(name, base="..", iteration=0):
 
 
 def print_rank_0(message):
-    if torch_xla.distributed.is_initialized():
-        if torch_xla.distributed.get_rank() == 0:
+    if torch.distributed.is_initialized():
+        if torch.distributed.get_rank() == 0:
             print(message, flush=True)
     else:
         print(message, flush=True)
@@ -58,7 +58,7 @@ def print_args(args):
 def print_params_min_max_norm(optimizer, iteration):
     """Print min, max, and norm of all parameters."""
     index = 0
-    rank = torch_xla.distributed.get_rank()
+    rank = torch.distributed.get_rank()
     string = 'iteration, rank, index, model-parallel,min, max, norm\n'
     optimizer_ = optimizer
     if isinstance(optimizer, FP16_Optimizer):
@@ -199,7 +199,7 @@ def save_checkpoint(iteration, model, optimizer,
         if mpu.get_data_parallel_rank() == 0:
             checkpoint_name = get_checkpoint_name(args.save, iteration)
             print('global rank {} is saving checkpoint at iteration {:7d} to {}'.
-                  format(torch_xla.distributed.get_rank(), iteration, checkpoint_name))
+                  format(torch.distributed.get_rank(), iteration, checkpoint_name))
 
             sd = {}
             sd['iteration'] = iteration
@@ -225,14 +225,14 @@ def save_checkpoint(iteration, model, optimizer,
             print('  successfully saved {}'.format(checkpoint_name))
 
     # Wait so everyone is done (necessary)
-    torch_xla.distributed.barrier()
+    torch.distributed.barrier()
     # And update the latest iteration
-    if torch_xla.distributed.get_rank() == 0:
+    if torch.distributed.get_rank() == 0:
         tracker_filename = get_checkpoint_tracker_filename(args.save)
         with open(tracker_filename, 'w') as f:
             f.write(str(iteration))
     # Wait so everyone is done (not necessary)
-    torch_xla.distributed.barrier()
+    torch.distributed.barrier()
 
 
 def save_ds_checkpoint(iteration, model, lr_scheduler, args):
@@ -313,7 +313,7 @@ def load_checkpoint(model, optimizer, lr_scheduler, args, load_optimizer_states=
 
         if mpu.get_data_parallel_rank() == 0:
             print('global rank {} is loading checkpoint {}'.format(
-                torch_xla.distributed.get_rank(), checkpoint_name))
+                torch.distributed.get_rank(), checkpoint_name))
 
         # Load the checkpoint.
         sd = torch.load(checkpoint_name, map_location='cpu')
