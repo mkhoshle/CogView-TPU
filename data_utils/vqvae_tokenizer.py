@@ -16,7 +16,7 @@ from tqdm import tqdm
 import numpy as np
 import torch
 import torch.nn.functional as F
-
+import torch_xla.core.xla_model as xm
 
 from vqvae import new_model, img2code, code2img
 from torchvision import transforms
@@ -33,7 +33,7 @@ def sqrt_int(x):
 class VQVAETokenizer(object):
     def __init__(self, 
             model_path, 
-            device='cuda'
+            device = xm.xla_device()
         ):
         ckpt = torch.load(model_path, map_location=torch.device(device))
 
