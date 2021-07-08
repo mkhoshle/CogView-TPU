@@ -674,8 +674,7 @@ def initialize_distributed(args):
     init_method += master_ip + ':' + master_port
     torch.distributed.init_process_group(
         backend=args.distributed_backend,
-        world_size=args.world_size, rank=args.rank,
-        init_method=init_method)
+        world_size=args.world_size, rank=args.rank)
 
     # Set the model-parallel / data-parallel communicators.
     mpu.initialize_model_parallel(args.model_parallel_size)
