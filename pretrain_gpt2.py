@@ -663,7 +663,7 @@ def initialize_distributed(args):
 #    torch.xla.set_device(device)
 
     device = idist.device()
-    assert device == torch.device(f"cuda:{args.local_rank}")
+    assert device == torch.device(f"xla:{args.local_rank}")
 
 
 
