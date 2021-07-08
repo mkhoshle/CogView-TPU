@@ -37,7 +37,11 @@ class VQVAETokenizer(object):
         ):
         ckpt = torch.load(model_path, map_location=torch.device(device))
         xm.send_cpu_data_to_device(ckpt,xm.xla_device())
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> fd96e0d1b9d7123f07c2e4b13adb4f42745158ed
         model = new_model()
 
         if list(ckpt.keys())[0].startswith('module.'):
