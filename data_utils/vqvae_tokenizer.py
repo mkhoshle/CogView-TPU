@@ -36,6 +36,7 @@ class VQVAETokenizer(object):
             device = xm.xla_device()
         ):
         ckpt = torch.load(model_path, map_location=torch.device(device))
+        xm.send_cpu_data_to_device(ckpt,xm.xla_device())
 
         model = new_model()
 
