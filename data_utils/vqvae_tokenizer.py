@@ -33,7 +33,7 @@ def sqrt_int(x):
 class VQVAETokenizer(object):
     def __init__(self, 
             model_path, 
-            device = xm.xla_device()
+            device = 'cpu'
         ):
         
         device = xm.xla_device()
