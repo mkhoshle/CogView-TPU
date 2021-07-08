@@ -104,30 +104,30 @@ def get_data_parallel_group():
 
 def get_model_parallel_world_size():
     """Return world size for the model parallel group."""
-    return idist.get_world_size(group=get_model_parallel_group())
+    return torch.distributed.get_world_size(group=get_model_parallel_group())
 
 
 def get_model_parallel_rank():
     """Return my rank for the model parallel group."""
-    return idist.get_rank(group=get_model_parallel_group())
+    return torch.distributed.get_rank(group=get_model_parallel_group())
 
 
 def get_model_parallel_src_rank():
     """Calculate the global rank corresponding to a local rank zeor
     in the model parallel group."""
-    global_rank = idist.get_rank()
+    global_rank = torch.distributed.get_rank()
     local_world_size = get_model_parallel_world_size()
     return (global_rank // local_world_size) * local_world_size
 
 
 def get_data_parallel_world_size():
     """Return world size for the data parallel group."""
-    return idist.get_world_size(group=get_data_parallel_group())
+    return torch.distributed.get_world_size(group=get_data_parallel_group())
 
 
 def get_data_parallel_rank():
     """Return my rank for the data parallel group."""
-    return idist.get_rank(group=get_data_parallel_group())
+    return torch.distributed.get_rank(group=get_data_parallel_group())
 
 
 def destroy_model_parallel():
