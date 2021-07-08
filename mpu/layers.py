@@ -60,19 +60,18 @@ def _initialize_affine_weight(weight, output_size, input_size,
     # Initialize master weight
     master_weight = torch.empty(output_size, input_size,
                                 dtype=weight.dtype,
-                                requires_grad=False,
-                                device=xm.xla_device())
+                                requires_grad=False)
     init_method(master_weight)
 
     # Split and copy
     per_partition_per_stride_size = divide(per_partition_size, stride)
     weight_list = torch.split(master_weight, per_partition_per_stride_size,
-                              dim=partition_dim, device=xm.xla_device())
+                              dim=partition_dim)
     rank = get_model_parallel_rank()
     my_weight_list = weight_list[rank::world_size]
 
     with torch.no_grad():
-        torch.cat(my_weight_list, dim=partition_dim, out=weight, device=xm.xla_device())
+        torch.cat(my_weight_list, dim=partition_dim, out=weight)
     if return_master_weight:
         return master_weight
     return None
@@ -111,7 +110,7 @@ class VocabParallelEmbedding(torch.nn.Module):
 
         # Allocate weights.
         self.weight = Parameter(torch.Tensor(self.num_embeddings_per_partition,
-                                             self.embedding_dim, device=xm.xla_device()))
+                                             self.embedding_dim))
         self.weight.model_parallel = True
         # And initialize.
         _initialize_affine_weight(
@@ -168,7 +167,7 @@ class ParallelEmbedding(torch.nn.Module):
 
         # Allocate weights.
         self.weight = Parameter(torch.Tensor(self.num_embeddings,
-                                             self.embedding_dim_per_partition, device=xm.xla_device()))
+                                             self.embedding_dim_per_partition))
         self.weight.model_parallel = True
         # And initialize.
         _initialize_affine_weight(
@@ -223,10 +222,10 @@ class ColumnParallelLinear(torch.nn.Module):
         # Note: torch.nn.functional.linear performs XA^T + b and as a result
         # we allocate the transpose.
         self.weight = Parameter(torch.Tensor(self.output_size_per_partition,
-                                             self.input_size, device=xm.xla_device()))
+                                             self.input_size))
         self.weight.model_parallel = True
         if bias:
-            self.bias = Parameter(torch.Tensor(self.output_size_per_partition, device=xm.xla_device()))
+            self.bias = Parameter(torch.Tensor(self.output_size_per_partition))
             self.bias.model_parallel = True
             # Always initialize bias to zero.
             with torch.no_grad():
@@ -297,10 +296,10 @@ class RowParallelLinear(torch.nn.Module):
         # Note: torch.nn.functional.linear performs XA^T + b and as a result
         # we allocate the transpose.
         self.weight = Parameter(torch.Tensor(self.output_size,
-                                             self.input_size_per_partition, device=xm.xla_device()))
+                                             self.input_size_per_partition))
         self.weight.model_parallel = True
         if bias:
-            self.bias = Parameter(torch.Tensor(self.output_size, device=xm.xla_device()))
+            self.bias = Parameter(torch.Tensor(self.output_size))
             # Always initialize bias to zero.
             with torch.no_grad():
                 self.bias.zero_()
