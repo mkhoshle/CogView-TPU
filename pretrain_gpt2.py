@@ -53,6 +53,7 @@ from utils import get_sample_writer
 import torch_xla.distributed as dist
 import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
+import ignite.distributed as idist
 
 from data_utils import make_loaders, get_tokenizer, detect_new_datasets
 
@@ -88,8 +89,8 @@ def get_model(args):
 #            sum([p.nelement() for p in model.parameters()])), flush=True)
 
     # To prevent OOM for model sizes that cannot fit in GPU memory in full precision
-    if hasattr(args, "deepspeed") and args.deepspeed and args.fp16:
-        model.half()
+#     if hasattr(args, "deepspeed") and args.deepspeed and args.fp16:
+#         model.half()
 
     # GPU allocation.
 #    model.cuda(torch.xla.current_device())
@@ -107,17 +108,18 @@ def get_model(args):
 #        else:
 #            model = DDP(model)
 
-    device = xm.xla_device()
-    mx    = xmp.MpModelWrapper(model)
-    model  = mx.to(device)
+#     device = xm.xla_device()
+#     mx    = xmp.MpModelWrapper(model)
+#     model  = mx.to(device)
+    model = idist.auto_model(model)
 
     return model
 
 
 def get_optimizer_param_groups(model):
     # Build parameter groups (weight decay and non-decay).
-    while isinstance(model, (DDP, FP16_Module)):
-        model = model.module
+#     while isinstance(model, (DDP, FP16_Module)):
+#         model = model.module
     param_groups = gpt2_get_params_for_weight_decay_optimization(model)
 
     # Add model parallel attribute if it is not set.
@@ -135,20 +137,23 @@ def get_optimizer(param_groups, args):
         #Apex FusedAdam uses decoupled weight decay so use the same here
         if args.cpu_torch_adam:
             cpu_adam_optimizer = torch.optim.AdamW
-        else:
-            #TODO add option for decoupled weight decay in DeepCPUAdam
-            from deepspeed.ops.adam import DeepSpeedCPUAdam
-            cpu_adam_optimizer = DeepSpeedCPUAdam
-        optimizer = cpu_adam_optimizer(param_groups,
-                        lr=args.lr, weight_decay=args.weight_decay)
+#         else:
+#             #TODO add option for decoupled weight decay in DeepCPUAdam
+#             from deepspeed.ops.adam import DeepSpeedCPUAdam
+#             cpu_adam_optimizer = DeepSpeedCPUAdam
+#         optimizer = cpu_adam_optimizer(param_groups,
+#                         lr=args.lr, weight_decay=args.weight_decay)
 #    else:
         # Use FusedAdam.
 #        optimizer = Adam(param_groups,
 #                         lr=args.lr, weight_decay=args.weight_decay)
+    else:
+        optimizer = optim.Adam(param_groups, lr=args.lr, weight_decay=args.weight_decay)
+        optimizer = idist.auto_optim(optimizer)
 
     print(f'Optimizer = {optimizer.__class__.__name__}')
-    if hasattr(args, "deepspeed") and args.deepspeed:
-        raise NotImplementedError
+#     if hasattr(args, "deepspeed") and args.deepspeed:
+#         raise NotImplementedError
         # fp16 wrapper is not required for DeepSpeed.
         # return optimizer
 
@@ -661,7 +666,7 @@ def initialize_distributed(args):
     master_ip = os.getenv('MASTER_ADDR', 'localhost')
     master_port = os.getenv('MASTER_PORT', '6000')
     init_method += master_ip + ':' + master_port
-    torch_xla.distributed.init_process_group(
+    torch.distributed.init_process_group(
         backend=args.distributed_backend,
         world_size=args.world_size, rank=args.rank,
         init_method=init_method)
@@ -671,8 +676,8 @@ def initialize_distributed(args):
 
     # Optional DeepSpeed Activation Checkpointing Features
     #
-    if hasattr(args, "deepspeed") and args.deepspeed and args.deepspeed_activation_checkpointing:
-        set_deepspeed_activation_checkpointing(args)
+#     if hasattr(args, "deepspeed") and args.deepspeed and args.deepspeed_activation_checkpointing:
+#         set_deepspeed_activation_checkpointing(args)
 
 
 def set_random_seed(seed):
