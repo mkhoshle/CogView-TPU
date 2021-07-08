@@ -661,6 +661,12 @@ def initialize_distributed(args):
 #    if args.local_rank is not None:
 #        device = args.local_rank
 #    torch.xla.set_device(device)
+
+    device = idist.device()
+    assert device == torch.device(f"cuda:{args.local_rank}")
+
+
+
     # Call the init process
     init_method = 'tcp://'
     master_ip = os.getenv('MASTER_ADDR', 'localhost')
