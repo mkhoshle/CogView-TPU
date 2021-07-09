@@ -1,5 +1,4 @@
 torch
-deepspeed
 tqdm
 lmdb
 filelock
