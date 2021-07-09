@@ -35,8 +35,8 @@ class VQVAETokenizer(object):
             model_path, 
             device = 'cpu'
         ):
-        print(model_path)
-        print(torch.load(model_path, map_location="cpu"))
+#         print(model_path)
+#         print(torch.load(model_path, map_location="cpu"))
         ckpt = torch.load(model_path, map_location="cpu")
     
         model = new_model()
