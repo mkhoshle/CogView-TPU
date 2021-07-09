@@ -79,11 +79,10 @@ def setup_model(args):
 
 def _parse_and_to_tensor(text, img_size=256, query_template='{}'):
     tokenizer = get_tokenizer()
-    text = query_template.format(*text.split('\t'))
+    text = query_template.format(*text.split('\\t'))
     seq = tokenizer.parse_query(text, img_size=img_size)
-    seq = torch.LongTensor(seq,device=xm.xla_device())
-    text = query_template.format(*text.split("\\t"))
-    
+    seq = torch.LongTensor(seq).to('cpu')
+
     return seq
 
 def get_context(args, query_template='{}'):
