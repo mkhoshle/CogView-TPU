@@ -30,7 +30,7 @@ from .layers import ColumnParallelLinear
 from .layers import RowParallelLinear
 from .mappings import gather_from_model_parallel_region
 
-import deepspeed
+# import deepspeed
 
 from .random import checkpoint
 from .random import get_cuda_rng_tracker
@@ -42,7 +42,7 @@ import torch_xla.distributed as dist
 
 class LayerNorm():
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+#         super().__init__(*args, **kwargs)
     def forward(self, x):
         return super().forward(x / (x.abs().max().detach()/8))
 
