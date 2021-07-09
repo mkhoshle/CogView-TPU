@@ -107,10 +107,10 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
                                        init_method=output_layer_init_method)
         self.output_dropout = torch.nn.Dropout(output_dropout_prob)
 
-        if deepspeed.checkpointing.is_configured():
-            global get_cuda_rng_tracker, checkpoint
-            get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
-            checkpoint = deepspeed.checkpointing.checkpoint
+#         if deepspeed.checkpointing.is_configured():
+#             global get_cuda_rng_tracker, checkpoint
+#             get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
+#             checkpoint = deepspeed.checkpointing.checkpoint
 
     def _transpose_for_scores(self, tensor):
         """Transpose a 3D tensor [b, s, np*hn] into a 4D tensor with
@@ -465,10 +465,10 @@ class GPT2ParallelTransformer(torch.nn.Module):
         # Final layer norm before output.
         self.final_layernorm = LayerNorm(hidden_size, eps=layernorm_epsilon)
 
-        if deepspeed.checkpointing.is_configured():
-            global get_cuda_rng_tracker, checkpoint
-            get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
-            checkpoint = deepspeed.checkpointing.checkpoint
+#         if deepspeed.checkpointing.is_configured():
+#             global get_cuda_rng_tracker, checkpoint
+#             get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
+#             checkpoint = deepspeed.checkpointing.checkpoint
         self.rmask = None
 
     def forward(self, hidden_states, position_ids, attention_mask, txt_indices_bool, img_indices_bool, is_sparse=0, *mems):
