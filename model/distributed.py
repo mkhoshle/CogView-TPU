@@ -56,7 +56,7 @@ class DistributedDataParallel(Module):
                             buckets[tp] = []
                         buckets[tp].append(param)
                 if self.warn_on_half:
-                    if torch.cuda.HalfTensor in buckets:
+                    if torch.HalfTensor in buckets:
                         print("WARNING: gloo dist backend for half parameters may be extremely slow." +
                               " It is recommended to use the NCCL backend in this case.")
                         self.warn_on_half = False
@@ -69,7 +69,7 @@ class DistributedDataParallel(Module):
                     if not no_scale and not reduce_after:
                         coalesced /= dist.get_world_size(group=self.data_parallel_group)
                     dist.all_reduce(coalesced, group=self.data_parallel_group)
-                    torch.cuda.synchronize()
+                    torch.synchronize()
                     if not no_scale and reduce_after:
                         coalesced /= dist.get_world_size(group=self.data_parallel_group)
                     for buf, synced in zip(grads, _unflatten_dense_tensors(coalesced, grads)):

@@ -32,7 +32,7 @@ from pretrain_gpt2 import set_random_seed
 from utils import load_checkpoint, get_checkpoint_iteration
 from data_utils import get_tokenizer
 import mpu
-import deepspeed
+# import deepspeed
 
 from fp16 import FP16_Module
 from model import GPT2Model

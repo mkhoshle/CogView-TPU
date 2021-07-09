@@ -18,7 +18,7 @@
 import argparse
 import os
 import torch
-import deepspeed
+# import deepspeed
 import json
 
 
@@ -310,7 +310,7 @@ def get_args():
     parser = add_sparse_args(parser)
 
     # Include DeepSpeed configuration arguments
-    parser = deepspeed.add_config_arguments(parser)
+#     parser = deepspeed.add_config_arguments(parser)
 
     args = parser.parse_args()
     if not args.train_data:
