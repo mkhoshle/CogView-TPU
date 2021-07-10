@@ -83,23 +83,26 @@ def initialize_model_parallel(model_parallel_size_):
 
 def model_parallel_is_initialized():
     """Check if model and data parallel groups are initialized."""
-    if _MODEL_PARALLEL_GROUP is None or _DATA_PARALLEL_GROUP is None:
-        return False
+#     if _MODEL_PARALLEL_GROUP is None or _DATA_PARALLEL_GROUP is None:
+#         return False
+#     return True
     return True
 
 
 def get_model_parallel_group():
     """Get the model parallel group the caller rank belongs to."""
-    assert _MODEL_PARALLEL_GROUP is not None, \
-        'model parallel group is not initialized'
-    return _MODEL_PARALLEL_GROUP
+#     assert _MODEL_PARALLEL_GROUP is not None, \
+#         'model parallel group is not initialized'
+#     return _MODEL_PARALLEL_GROUP
+    pass
 
 
 def get_data_parallel_group():
     """Get the data parallel group the caller rank belongs to."""
-    assert _DATA_PARALLEL_GROUP is not None, \
-        'data parallel group is not initialized'
-    return _DATA_PARALLEL_GROUP
+#     assert _DATA_PARALLEL_GROUP is not None, \
+#         'data parallel group is not initialized'
+#     return _DATA_PARALLEL_GROUP
+    pass
 
 
 def get_model_parallel_world_size():
