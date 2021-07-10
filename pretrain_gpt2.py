@@ -53,7 +53,6 @@ from utils import get_sample_writer
 import torch_xla.distributed as dist
 import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
-import ignite.distributed as idist
 
 from data_utils import make_loaders, get_tokenizer, detect_new_datasets
 
@@ -100,13 +99,13 @@ def get_model(args):
         model = FP16_Module(model)
 
     # Wrap model for distributed training.
-    if not args.deepspeed:
-        if USE_TORCH_DDP:
-            i = xm.xla_device()
-            model = DDP(model, device_ids=[i], output_device=i,
-                       process_group=mpu.get_data_parallel_group())
-        else:
-            model = DDP(model)
+#     if not args.deepspeed:
+#         if USE_TORCH_DDP:
+#             i = xm.xla_device()
+#             model = DDP(model, device_ids=[i], output_device=i,
+#                        process_group=mpu.get_data_parallel_group())
+#         else:
+#             model = DDP(model)
 
     device = xm.xla_device()
     mx    = xmp.MpModelWrapper(model)
@@ -652,7 +651,6 @@ def set_deepspeed_activation_checkpointing(args):
     mpu.get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
     mpu.model_parallel_cuda_manual_seed = deepspeed.checkpointing.model_parallel_cuda_manual_seed
 
-
 def initialize_distributed(args):
     """Initialize torch.distributed."""
 
@@ -661,10 +659,6 @@ def initialize_distributed(args):
 #    if args.local_rank is not None:
 #        device = args.local_rank
 #    torch.xla.set_device(device)
-
-    device = idist.device()
-    assert device == torch.device(f"xla:{args.local_rank}")
-
 
 
     # Call the init process

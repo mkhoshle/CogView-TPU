@@ -66,7 +66,6 @@ def setup_model(args):
         if args.deepspeed:
             iteration, release, success = get_checkpoint_iteration(args)
             path = os.path.join(args.load, str(iteration), "mp_rank_00_model_states.pt")
-            device = xm.xla_device()
             print('current device:', device)
             checkpoint = torch.load(path, map_location=torch.device('cpu'))
             model.load_state_dict(checkpoint["module"])
@@ -75,6 +74,8 @@ def setup_model(args):
             _ = load_checkpoint(
                 model, None, None, args, load_optimizer_states=False)
 
+    device = xm.xla_device()
+    model = model.to(device)
     return model
 
 def _parse_and_to_tensor(text, img_size=256, query_template='{}'):
@@ -157,7 +158,7 @@ def get_context(args, query_template='{}'):
                     continue
             yield (raw_text, seq, output_path)
 
-
+            
 def generate_images_once(model, args, raw_text, seq=None, num=8, query_template='{}', output_path='./samples'):
     tokenizer = get_tokenizer()
     if not os.path.exists(output_path):
@@ -230,6 +231,7 @@ def generate_images_continually(model, args):
         query_template = '[BASE] [BOI1] [Image]{} [EOI1] [ROI1] {}'
     else:
         raise NotImplementedError
+        
     for raw_text, seq, output_path in get_context(args, query_template):
         if args.generation_task == 'super-resolution':
             super_resolution(model, args, raw_text, seq, output_path=output_path)
@@ -290,14 +292,15 @@ def post_selection(model, args, raw_text, seq, output_path):
 
                 
 def prepare_tokenizer(args):
-
     tokenizer = get_tokenizer(args)
-
     num_tokens = tokenizer.num_tokens
     before = num_tokens
     after = before
-    multiple = args.make_vocab_size_divisible_by * \
-               mpu.get_model_parallel_world_size()
+#     multiple = args.make_vocab_size_divisible_by * \
+#                mpu.get_model_parallel_world_size()
+
+#   This is for multiprocessing on single TPU
+    multiple = args.make_vocab_size_divisible_by * 8
     while (after % multiple) != 0:
         after += 1
     print_rank_0('> padded vocab (size: {}) with {} dummy '
