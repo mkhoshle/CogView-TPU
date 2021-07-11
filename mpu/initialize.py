@@ -19,6 +19,7 @@
 import torch
 import torch_xla
 import ignite.distributed as idist
+import torch_xla.core.xla_model as xm
 
 from .utils import ensure_divisibility
 
@@ -107,12 +108,12 @@ def get_data_parallel_group():
 
 def get_model_parallel_world_size():
     """Return world size for the model parallel group."""
-    return torch.distributed.get_world_size(group=get_model_parallel_group())
+    return  xm.xrt_world_size()
 
 
 def get_model_parallel_rank():
     """Return my rank for the model parallel group."""
-    return torch.distributed.get_rank(group=get_model_parallel_group())
+    return xm.get_ordinal()
 
 
 def get_model_parallel_src_rank():

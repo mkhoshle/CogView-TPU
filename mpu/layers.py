@@ -103,8 +103,8 @@ class VocabParallelEmbedding(torch.nn.Module):
         # Divide the weight matrix along the vocaburaly dimension.
         self.vocab_start_index, self.vocab_end_index = \
             VocabUtility.vocab_range_from_global_vocab_size(
-                self.num_embeddings, get_model_parallel_rank(),
-                get_model_parallel_world_size())
+                self.num_embeddings, xm.get_ordinal(),
+                xm.xrt_world_size())
         self.num_embeddings_per_partition = self.vocab_end_index - \
                                             self.vocab_start_index
 
