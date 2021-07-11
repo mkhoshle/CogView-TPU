@@ -21,6 +21,7 @@ import time
 import numpy as np
 import torch
 import torch_xla
+import torch_xla.core.xla_model as xm
 
 from torch.nn.parallel.distributed import DistributedDataParallel as torchDDP
 from fp16 import FP16_Optimizer
@@ -311,9 +312,9 @@ def load_checkpoint(model, optimizer, lr_scheduler, args, load_optimizer_states=
         # Checkpoint.
         checkpoint_name = get_checkpoint_name(args.load, iteration, release)
 
-        if mpu.get_data_parallel_rank() == 0:
+        if xm.get_ordinal() == 0:
             print('global rank {} is loading checkpoint {}'.format(
-                torch.distributed.get_rank(), checkpoint_name))
+                xm.get_ordinal(), checkpoint_name))
 
         # Load the checkpoint.
         sd = torch.load(checkpoint_name, map_location='cpu')
@@ -372,7 +373,7 @@ def load_checkpoint(model, optimizer, lr_scheduler, args, load_optimizer_states=
                          'state.'.format(checkpoint_name))
             exit()
 
-    if mpu.get_data_parallel_rank() == 0:
+    if xm.get_ordinal() == 0:
         print('  successfully loaded {}'.format(checkpoint_name))
 
     return iteration
