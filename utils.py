@@ -317,7 +317,8 @@ def load_checkpoint(model, optimizer, lr_scheduler, args, load_optimizer_states=
                 xm.get_ordinal(), checkpoint_name))
 
         # Load the checkpoint.
-        sd = torch.load(checkpoint_name, map_location='cpu')
+        device = xm.xla_device()
+        sd = torch.load(checkpoint_name, map_location=device)
 
         if isinstance(model, torchDDP):
             model = model.module
