@@ -178,16 +178,26 @@ def generate_images_once(model, args, raw_text, seq=None, num=8, query_template=
             invalid_slices = [slice(0, tokenizer.img_tokenizer.num_tokens)]
         else:
             NotImplementedError
+            
+        print(111)
 
         mbz = args.max_inference_batch_size
+        
+        print(222)
+        
         add_interlacing_beam_marks(seq, nb=min(num, mbz))
+        
+        print(333)
+        
         assert num < mbz or num % mbz == 0
         output_tokens_list = []
         for tim in range(max(num // mbz, 1)):
             output_tokens_list.append(filling_sequence(model, seq.clone(), args))
-            torch.xla.empty_cache()
-
-        output_tokens_list = torch.cat(output_tokens_list, dim=0, device=xm.xla_device())
+        
+        print(444)
+        
+        device=xm.xla_device()
+        output_tokens_list = torch.cat(output_tokens_list, dim=0).to(device)
         
         print("\nTaken time {:.2f}\n".format(time.time() - start_time), flush=True)
         print("\nContext:", raw_text, flush=True)
