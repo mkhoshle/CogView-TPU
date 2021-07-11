@@ -106,6 +106,8 @@ def get_model(args):
 #                        process_group=mpu.get_data_parallel_group())
 #         else:
 #             model = DDP(model)
+
+    device = xm.xla_device()
     model.to(device)
     return model
 
