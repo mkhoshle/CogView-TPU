@@ -198,6 +198,8 @@ def shrink_beams(tokens, mems, nb, score):
     return tokens, new_mems, score
 
 def add_interlacing_beam_marks(seq, nb=12, period=3000):
+    print(seq)
+    print(len(seq))
     assert isinstance(seq, list) or len(seq.shape) == 1
     blk_cnt = 0
     for i in range(len(seq)):
