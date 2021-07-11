@@ -294,8 +294,8 @@ def load_checkpoint(model, optimizer, lr_scheduler, args, load_optimizer_states=
 
     iteration, release, success = get_checkpoint_iteration(args)
 
-    if not success:
-        return 0
+    if success:
+        return 'successful'
 
     if args.deepspeed:
         
@@ -319,7 +319,8 @@ def load_checkpoint(model, optimizer, lr_scheduler, args, load_optimizer_states=
 
         # Load the checkpoint.
         device = xm.xla_device()
-        sd = torch.load(checkpoint_name, map_location=device)
+        sd = torch.load(checkpoint_name, map_location='cpu')
+        sd.to(device)
 
         if isinstance(model, torchDDP):
             model = model.module

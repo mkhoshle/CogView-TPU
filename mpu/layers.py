@@ -108,8 +108,9 @@ class VocabParallelEmbedding(torch.nn.Module):
                                             self.vocab_start_index
 
         # Allocate weights.
+        device = xm.xla_device()
         self.weight = Parameter(torch.Tensor(self.num_embeddings_per_partition,
-                                             self.embedding_dim))
+                                             self.embedding_dim).to(device))
         self.weight.model_parallel = True
         # And initialize.
         _initialize_affine_weight(
