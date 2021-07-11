@@ -101,7 +101,9 @@ def get_context(args, query_template='{}'):
         if args.generation_task == 'post-selection':
             raise ValueError('post-selection only takes file inputs!')
         while True:
-            raw_text = input("\nPlease Input Query (stop to exit) >>> ") 
+#             raw_text = input("\nPlease Input Query (stop to exit) >>> ") 
+            raw_text = "an armchair in the shape of an avocado" 
+    
             if not raw_text:
                 print('Query should not be empty!')
                 continue

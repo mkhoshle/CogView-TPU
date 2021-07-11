@@ -23,7 +23,6 @@ import math
 import torch
 import torch_xla
 import torch_xla.core.xla_model as xm
-
 import torch.nn.functional as F
 import torch.nn.init as init
 from torch.nn.parameter import Parameter
