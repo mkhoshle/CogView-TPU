@@ -165,7 +165,8 @@ def get_checkpoint_name(checkpoints_path, iteration, release=False, zero=False):
     if zero:
         dp_rank = mpu.get_data_parallel_rank()
         d += '_zero_dp_rank_{}'.format(dp_rank)
-    return os.path.join(checkpoints_path, d, 'mp_rank_{:02d}_model_states.pt'.format(mpu.get_model_parallel_rank()))
+#     return os.path.join(checkpoints_path, d, 'mp_rank_{:02d}_model_states.pt'.format(mpu.get_model_parallel_rank()))
+    return os.path.join(checkpoints_path, d, 'mp_rank_{:02d}_model_states.pt'.format(0))
 
 
 def ensure_directory_exists(filename):
