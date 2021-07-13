@@ -73,7 +73,9 @@ def filling_sequence(
         context_length: first non(-1)s
     '''
     tokenizer = get_tokenizer()
-    device = seq.device
+#     device = seq.device
+    seq = seq.to('cpu')
+    
     assert len(seq.shape) == 1
     out_seq_length = len(seq)
     # building the initial tokens, attention_mask, and position_ids
@@ -94,7 +96,7 @@ def filling_sequence(
         if seq[context_length] == tokenizer['[ROI2]']:
             offset = context_length
         context_length += 1
-    tokens, attention_mask, position_ids = get_batch(seq[:context_length], device, args)
+    tokens, attention_mask, position_ids = get_batch(seq[:context_length], 'cpu', args)
 
     counter = context_length - 1 # == len(tokens) - 1
     index = 0 # len(mems)
