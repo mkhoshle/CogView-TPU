@@ -187,11 +187,8 @@ def generate_images_once(model, args, raw_text, seq=None, num=8, query_template=
         add_interlacing_beam_marks(seq, nb=min(num, mbz))
         
         print(333)
-        device=xm.xla_device()
-        seq = seq.to(device)
-        
-        model = xm.send_cpu_data_to_device(model,device)
-        model = model.to(device)
+#         device=xm.xla_device()
+#         seq = seq.to(device)
         
         assert num < mbz or num % mbz == 0
         output_tokens_list = []
