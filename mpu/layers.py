@@ -125,6 +125,8 @@ class VocabParallelEmbedding(torch.nn.Module):
         masked_input = input_.clone() - self.vocab_start_index
         masked_input[input_mask] = 0
         # Get the embeddings.
+        device = xm.xla_device()
+        masked_input = masked_input.to(device)
         output_parallel = F.embedding(masked_input, self.weight,
                                       self.padding_idx, self.max_norm,
                                       self.norm_type, self.scale_grad_by_freq,
