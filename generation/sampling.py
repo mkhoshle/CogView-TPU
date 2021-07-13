@@ -28,7 +28,7 @@ def top_k_logits(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
     if top_k > 0:
         # Remove all tokens with a probability less than the last token of the top-k
         indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]
-        logits = logits.to('cpu')
+        
         print(np.shape(logits))
         print(len(indices_to_remove))
         
@@ -166,6 +166,8 @@ def filling_sequence(
         logits /= temp
         for invalid_slice in invalid_slices: # forbide to generate other tokens
             logits[..., invalid_slice] = -float('Inf')
+        
+        logits = logits.to('cpu')
         logits = top_k_logits(logits, top_k=args.top_k, top_p=args.top_p)
         log_probs = F.softmax(logits, dim=-1)
 

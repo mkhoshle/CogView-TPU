@@ -192,8 +192,9 @@ def generate_images_once(model, args, raw_text, seq=None, num=8, query_template=
         
         assert num < mbz or num % mbz == 0
         output_tokens_list = []
-        print(num // mbz)
+        
         for tim in range(max(num // mbz, 1)):
+            print(tim)
             output_tokens_list.append(filling_sequence(model, seq.clone(), args))
         
         print(444)
