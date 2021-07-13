@@ -107,8 +107,8 @@ def get_model(args):
 #         else:
 #             model = DDP(model)
 
-    device = xm.xla_device()
-    model.to(device)
+#     device = xm.xla_device()
+#     model.to(device)
     return model
 
 
