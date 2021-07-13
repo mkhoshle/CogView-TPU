@@ -229,8 +229,6 @@ class GPT2ParallelMLP(torch.nn.Module):
     def forward(self, hidden_states):
         # [b, s, 4hp]
         intermediate_parallel = self.dense_h_to_4h(hidden_states)
-        device = xm.xla_device()
-        intermediate_parallel = intermediate_parallel.to(device)
         intermediate_parallel = gelu(intermediate_parallel)
 
         # [b, s, h]

@@ -190,6 +190,9 @@ def generate_images_once(model, args, raw_text, seq=None, num=8, query_template=
         device=xm.xla_device()
         seq = seq.to(device)
         
+        model = xm.send_cpu_data_to_device(model,device)
+        model = model.to(device)
+        
         assert num < mbz or num % mbz == 0
         output_tokens_list = []
         for tim in range(max(num // mbz, 1)):
