@@ -203,7 +203,6 @@ def add_interlacing_beam_marks(seq, nb=12, period=3000):
     assert isinstance(seq, list) or len(seq.shape) == 1
     blk_cnt = 0
     for i in range(len(seq)):
-        print(i)
         if seq[i] == -1:
             blk_cnt += 1
             seq[i] = -nb
