@@ -12,7 +12,7 @@ import sys
 import math
 import random
 from tqdm import tqdm
-
+import torch_xla.core.xla_model as xm
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -27,10 +27,10 @@ def top_k_logits(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
 
     if top_k > 0:
         # Remove all tokens with a probability less than the last token of the top-k
-        indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]    
+        indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None] 
+        
+        xm.mark_step()
         print(logits.device)
-        logits = logits.to('cpu')
-        print(logits)
         print(len(logits))
         print(len(indices_to_remove ),indices_to_remove )
         
@@ -134,7 +134,6 @@ def filling_sequence(
             position_ids[position_ids > offset] -= offset
             logits, *mems = model(tokens, position_ids, attention_mask, txt_indices_bool, img_indices_bool, is_sparse=args.is_sparse, *mems)
             index = counter
-            print(logits)
         elif seq[counter + 1] >= 0: # provided
             if seq[counter + 1] == tokenizer['[ROI2]']:
                 offset = counter + 1
@@ -163,7 +162,6 @@ def filling_sequence(
         counter += 1
         index += 1
         
-        print(logits,222)
 
         logits = logits[:, -1] # [batch size, vocab size]
 
