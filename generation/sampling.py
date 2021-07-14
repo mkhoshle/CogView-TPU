@@ -27,7 +27,10 @@ def top_k_logits(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
 
     if top_k > 0:
         # Remove all tokens with a probability less than the last token of the top-k
-        indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]        
+        indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]    
+        print(type(logits))
+        print(len(indices_to_remove ),indices_to_remove )
+        
         logits[indices_to_remove] = filter_value
 
     if top_p > 0.0:
