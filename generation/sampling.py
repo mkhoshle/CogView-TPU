@@ -134,6 +134,7 @@ def filling_sequence(
             position_ids[position_ids > offset] -= offset
             logits, *mems = model(tokens, position_ids, attention_mask, txt_indices_bool, img_indices_bool, is_sparse=args.is_sparse, *mems)
             index = counter
+            print(logits)
         elif seq[counter + 1] >= 0: # provided
             if seq[counter + 1] == tokenizer['[ROI2]']:
                 offset = counter + 1
@@ -157,11 +158,12 @@ def filling_sequence(
                 txt_indices_bool, img_indices_bool, args.is_sparse,
                 *mems)
             
-            print(logits)
             index = counter
         nb = -seq[counter + 1]
         counter += 1
         index += 1
+        
+        print(logits,222)
 
         logits = logits[:, -1] # [batch size, vocab size]
 
