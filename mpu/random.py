@@ -28,7 +28,7 @@ import torch_xla.core.xla_model as xm
 
 from torch import _C
 # from torch.cuda import _lazy_call, device as device_ctx_manager
-#from torch.utils.checkpoint import detach_variable
+from torch.utils.checkpoint import detach_variable
 
 
 import torch_xla.distributed as dist

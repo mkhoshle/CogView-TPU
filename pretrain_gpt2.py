@@ -95,8 +95,8 @@ def get_model(args):
 #    model.cuda(torch.xla.current_device())
 
     # Fp16 conversion.
-#     if args.fp16:
-#         model = FP16_Module(model)
+    if args.fp16:
+        model = FP16_Module(model)
 
     # Wrap model for distributed training.
 #     if not args.deepspeed:
