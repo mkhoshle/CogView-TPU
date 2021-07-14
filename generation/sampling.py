@@ -156,6 +156,8 @@ def filling_sequence(
                 0, # rebuild in transformers (sep version)
                 txt_indices_bool, img_indices_bool, args.is_sparse,
                 *mems)
+            
+            print(logits)
             index = counter
         nb = -seq[counter + 1]
         counter += 1
