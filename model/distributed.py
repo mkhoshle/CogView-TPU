@@ -19,7 +19,7 @@ import torch.distributed as dist
 from torch.nn.modules import Module
 from torch.autograd import Variable
 from torch.nn.parallel.distributed import DistributedDataParallel as DDP
-
+import torch_xla.core.xla_model as xm
 import mpu
 
 
@@ -43,7 +43,7 @@ class DistributedDataParallel(Module):
         src_rank = mpu.get_model_parallel_rank()
         for p in self.module.parameters():
             if torch.is_tensor(p):
-                dist.broadcast(p, src_rank, group=self.data_parallel_group)
+                xm.broadcast(p, src_rank, group=self.data_parallel_group)
 
         def allreduce_params(reduce_after=True, no_scale=False, fp32_allreduce=False):
             if(self.needs_reduction):
@@ -67,11 +67,13 @@ class DistributedDataParallel(Module):
                     if fp32_allreduce:
                         coalesced = coalesced.float()
                     if not no_scale and not reduce_after:
-                        coalesced /= dist.get_world_size(group=self.data_parallel_group)
-                    dist.all_reduce(coalesced, group=self.data_parallel_group)
+                        coalesced /= xm.xrt_world_size()
+#                         coalesced /= dist.get_world_size(group=self.data_parallel_group)
+                    xm.all_reduce(coalesced, group=self.data_parallel_group)
                     torch.synchronize()
                     if not no_scale and reduce_after:
-                        coalesced /= dist.get_world_size(group=self.data_parallel_group)
+                        coalesced /= xm.xrt_world_size()
+#                         coalesced /= dist.get_world_size(group=self.data_parallel_group)
                     for buf, synced in zip(grads, _unflatten_dense_tensors(coalesced, grads)):
                         buf.copy_(synced)
         self.hook_handles = []
