@@ -99,13 +99,13 @@ def get_model(args):
 #         model = FP16_Module(model)
 
     # Wrap model for distributed training.
-    if not args.deepspeed:
-        if USE_TORCH_DDP:
-            i = xm.xla_device()
-            model = DDP(model, device_ids=[i], output_device=i,
-                       process_group=mpu.get_data_parallel_group())
-        else:
-            model = DDP(model)
+#     if not args.deepspeed:
+#         if USE_TORCH_DDP:
+#             i = xm.xla_device()
+#             model = DDP(model, device_ids=[i], output_device=i,
+#                        process_group=mpu.get_data_parallel_group())
+#         else:
+#             model = DDP(model)
 
 #     device = xm.xla_device()
 #     model.to(device)
