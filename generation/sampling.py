@@ -126,8 +126,6 @@ def filling_sequence(
 
         if index == 0: # first 
             position_ids[position_ids > offset] -= offset
-            print(model.config)
-            
             logits, *mems = model(tokens, position_ids, attention_mask, txt_indices_bool, img_indices_bool, is_sparse=args.is_sparse, *mems)
             index = counter
         elif seq[counter + 1] >= 0: # provided
